@@ -1,0 +1,31 @@
+version: '3'
+services:
+  reverb_db:
+    image: postgres:9.5
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: everstore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - .docker/postgresql/data:/var/lib/postgresql/data
+
+  reverb_cache:
+    image: redis:5.0.3-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - .docker/redis/data:/data
+
+  rever_cache_ui:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    depends_on:
+      - reverb_cache
+    environment:
+      - REDIS_HOSTS=local:reverb_cache:6379
+    ports:
+      - "8081:8081"
