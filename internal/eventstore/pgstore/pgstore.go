@@ -7,12 +7,11 @@ import (
 	"reflect"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/edgestore/edgestore/internal/errors"
 	"github.com/edgestore/edgestore/internal/eventstore"
 	"github.com/edgestore/edgestore/internal/model"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/sirupsen/logrus"
 )
 
@@ -43,6 +42,7 @@ func (p *PgStore) Load(ctx context.Context, aggregateID model.ID, tenantID model
 
 	history := make(eventstore.History, 0)
 	_, err := p.db.
+		WithContext(ctx).
 		WithParam("tableName", p.tableName).
 		WithParam("aggregateID", aggregateID).
 		WithParam("tenantID", tenantID).
@@ -104,7 +104,7 @@ func (p *PgStore) Save(ctx context.Context, aggregateID model.ID, tenantID model
 		}
 	}
 
-	if err := p.db.Insert(&records); err != nil {
+	if _, err := p.db.ModelContext(ctx, &records).Insert(); err != nil {
 		return err
 	}
 
@@ -117,16 +117,7 @@ func New(options *pg.Options, logger logrus.FieldLogger) eventstore.Store {
 	logger.Infof("Postgres Store: connection=postgresql://%s/%s", options.Addr, options.Database)
 
 	db := pg.Connect(options)
-	db.OnQueryProcessed(func(event *pg.QueryProcessedEvent) {
-		query, err := event.FormattedQuery()
-		if err != nil {
-			panic(err)
-		}
-
-		logger.WithField("query", query).
-			WithField("latency", time.Since(event.StartTime)).
-			Debugf("Query processed")
-	})
+	db.AddQueryHook(NewDebugHook(logger))
 
 	return &PgStore{
 		db:     db,
