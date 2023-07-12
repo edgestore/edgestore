@@ -36,7 +36,7 @@ type Stats struct {
 	HeapIdle     uint64 `json:"heap_idle"`
 	HeapInuse    uint64 `json:"heap_inuse"`
 	HeapReleased uint64 `json:"heap_released"`
-	HeapEntitys  uint64 `json:"heap_entities"`
+	HeapObjects  uint64 `json:"heap_objects"`
 	// garbage collection
 	GcNext           uint64    `json:"gc_next"`
 	GcLast           uint64    `json:"gc_last"`
@@ -126,7 +126,7 @@ func GetStats(version string) *Stats {
 		HeapIdle:     mem.HeapIdle,
 		HeapInuse:    mem.HeapInuse,
 		HeapReleased: mem.HeapReleased,
-		HeapEntitys:  mem.HeapEntitys,
+		HeapObjects:  mem.HeapObjects,
 		// garbage collection
 		GcNext:           mem.NextGC,
 		GcLast:           mem.LastGC,

@@ -3,7 +3,7 @@ package master
 import (
 	"github.com/edgestore/edgestore/internal/server"
 	"github.com/go-pg/pg"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 type Config struct {

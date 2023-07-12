@@ -10,7 +10,7 @@ import (
 	"github.com/edgestore/edgestore/internal/eventstore"
 	"github.com/edgestore/edgestore/internal/model"
 	"github.com/edgestore/edgestore/internal/worker"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
@@ -73,7 +73,7 @@ func New(cfg *Config) *Service {
 func (s *Service) getEntityFromCache(ctx context.Context, id model.ID, tenantID model.ID) (*Entity, error) {
 	key := NewCacheKey(s.cachePrefix, id, tenantID)
 
-	m, err := s.cache.WithContext(ctx).HGetAll(key).Result()
+	m, err := s.cache.HGetAll(ctx, key).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (s *Service) setEntityToCache(ctx context.Context, entity *Entity) error {
 
 	m := convertEntityToMap(entity)
 
-	if _, err := s.cache.WithContext(ctx).HMSet(key, m).Result(); err != nil {
+	if _, err := s.cache.HMSet(ctx, key, m).Result(); err != nil {
 		return err
 	}
 

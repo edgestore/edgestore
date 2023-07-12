@@ -1,19 +1,18 @@
 package master
 
 import (
+	"context"
 	"net/http"
 	"time"
 
-	"github.com/edgestore/edgestore/internal/guid"
-
 	"github.com/edgestore/edgestore/association"
-
 	"github.com/edgestore/edgestore/entity"
 	"github.com/edgestore/edgestore/internal/eventstore"
 	"github.com/edgestore/edgestore/internal/eventstore/pgstore"
+	"github.com/edgestore/edgestore/internal/guid"
 	"github.com/edgestore/edgestore/internal/server"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
@@ -92,7 +91,7 @@ func (s *service) Run() error {
 	s.logger.Info("Edgestore: Starting Master")
 
 	if s.cache != nil {
-		if _, err := s.cache.Ping().Result(); err != nil {
+		if _, err := s.cache.Ping(context.Background()).Result(); err != nil {
 			s.logger.Errorf("unable to connect to Redis: %v", err)
 		} else {
 			s.logger.Infof("Connected to Redis at %v", s.cfg.Cache.Addr)
@@ -106,7 +105,7 @@ func (s *service) Shutdown() {
 	s.logger.Info("Edgestore: Stopping Master")
 
 	if s.cache != nil {
-		if _, err := s.cache.Shutdown().Result(); err != nil {
+		if _, err := s.cache.Shutdown(context.Background()).Result(); err != nil {
 			s.logger.Error(err)
 		}
 	}

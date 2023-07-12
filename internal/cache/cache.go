@@ -141,6 +141,7 @@ func (c *InMemory) Run() error {
 		go runJanitor(c.cleanupInterval, c.stop)
 	}
 
+	return nil
 }
 
 func (c *InMemory) Shutdown() error {

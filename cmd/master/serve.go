@@ -11,7 +11,7 @@ import (
 	"github.com/edgestore/edgestore/internal/server"
 	"github.com/edgestore/edgestore/master"
 	"github.com/go-pg/pg"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

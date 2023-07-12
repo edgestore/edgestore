@@ -10,7 +10,7 @@ import (
 	"github.com/edgestore/edgestore/internal/eventstore"
 	"github.com/edgestore/edgestore/internal/model"
 	"github.com/edgestore/edgestore/internal/worker"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
@@ -73,7 +73,7 @@ func New(cfg *Config) *Service {
 func (s *Service) getAssociationFromCache(ctx context.Context, id model.ID, tenantID model.ID) (*Association, error) {
 	key := NewCacheKey(s.cachePrefix, id, tenantID)
 
-	m, err := s.cache.WithContext(ctx).HGetAll(key).Result()
+	m, err := s.cache.HGetAll(ctx, key).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (s *Service) setAssociationToCache(ctx context.Context, assoc *Association)
 	assocKey := NewCacheKey(s.cachePrefix, assoc.ID, assoc.TenantID)
 
 	m := convertAssociationToMapString(assoc)
-	if _, err := s.cache.WithContext(ctx).HMSet(assocKey, m).Result(); err != nil {
+	if _, err := s.cache.HMSet(ctx, assocKey, m).Result(); err != nil {
 		return err
 	}
 
@@ -104,7 +104,7 @@ func (s *Service) setAssociationToCache(ctx context.Context, assoc *Association)
 		Score:  float64(assoc.UpdatedAt.Unix()),
 	}
 
-	if _, err := s.cache.WithContext(ctx).ZAdd(typeKey, z).Result(); err != nil {
+	if _, err := s.cache.ZAdd(ctx, typeKey, z).Result(); err != nil {
 		return err
 	}
 
