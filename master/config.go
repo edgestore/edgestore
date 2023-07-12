@@ -2,7 +2,7 @@ package master
 
 import (
 	"github.com/edgestore/edgestore/internal/server"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/redis/go-redis/v9"
 )
 
